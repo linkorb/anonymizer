@@ -15,6 +15,8 @@ class Anonymizer
 {
     protected $name;
     protected $columns = [];
+    protected $truncate = [];
+    protected $drop = [];
 
     use BoostTrait;
     use ProtectedAccessorsTrait;
@@ -118,6 +120,39 @@ class Anonymizer
                         ]
                     );
                 }
+            }
+        }
+        $output->writeLn("");
+
+        // truncate tables
+        foreach ($this->truncate as $tableName) {
+            $output->writeLn("Truncating table: <info>" . $tableName . "</info>");
+
+            $subStmt = $pdo->prepare(
+                "TRUNCATE " . $tableName . ';'
+            );
+            $subStmt->execute();
+        }
+
+        foreach ($this->drop as $drop) {
+            $part = explode('.', $drop);
+            $tableName = $part[0];
+            if (count($part)==1) {
+                $output->writeLn("Dropping table: <info>{$tableName}</info>");
+
+                $subStmt = $pdo->prepare(
+                    "DROP TABLE " . $tableName . ';'
+                );
+                $subStmt->execute();
+            }
+            if (count($part)==2) {
+                $columnName = $part[1];
+                $output->writeLn("Dropping column: <info>{$tableName}.{$columnName}</info>");
+
+                $subStmt = $pdo->prepare(
+                    "ALTER TABLE " . $tableName . ' DROP COLUMN ' . $columnName
+                );
+                $subStmt->execute();
             }
         }
 

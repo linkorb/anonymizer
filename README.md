@@ -2,32 +2,53 @@ Anonymizer
 ==========
 Anonymizer is a toolkit to help you to automate production data anonymization for test environments and compliancy.
 
+## Features:
+
+* Scramble data by column
+* Maintains referential integrity
+* Consistent output state on multiple runs of same source data
+* Truncate entire tables
+* Drop tables or individual columns
+* Store configuration (DSN + Filename) in a .env file
+
 ## Usage
 
-1. Check your application's database schema and decide which columns contain sensitive information. For example: `user.email` or `request.ip`, etc.
-2. Create an `anonymizer.yml` file for your application that lists all the identified columns with a method for anonymization.
-3. Run anonymizer on your test database.
+1. Scan your application's database schema and decide which columns contain sensitive information. For example: `user.email` or `request.ip`, etc.
+2. Create a configuration file (example below) for your application that lists all the sensitive columns with a method for anonymization.
+3. Run anonymizer on your test database:
 
+    bin/anonymizer anonymizer.yml mysql://username:password@hostname/dbname
 
 ## anonymizer.yml format
 
-This file defines which columns needs to be anonymized, and using which method. Here's an example:
+This file defines which columns needs to be anonymized, and using which method. Additionally you truncate or drop entire tables or columns.
+
+Here's an example:
 
 ```yml
-user.email:
-  method: faker
-  arguments:
-    formatter: email
-  cascades:
-    - user_email.address
-    - comment.email
+---
+columns:
+    user.email:
+      method: faker
+      arguments:
+        formatter: email
+      cascades:
+        - user_email.address
+        - comment.email
 
-request.ip:
-  method: faker
-  arguments:
-    formatter: ipv5
-  cascades:
-    - exception.ip
+    request.ip:
+      method: faker
+      arguments:
+        formatter: ipv5
+      cascades:
+        - exception.ip
+truncate:
+  - table1
+  - table2
+
+drop:
+  - user.ip
+  - request.agent
 ```
 
 All columns are listed in `tableName.columnName` format. For each column a `method` is defined, with some optional `arguments`. Most common is the `faker` method, that takes a `formatter` as an argument (i.e. email, userName, city, ipv4, etc - see the faker docs for more)

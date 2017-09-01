@@ -18,20 +18,44 @@ class RunCommand extends Command
         $this
             ->setName('run')
             ->setDescription('Run anonymizer')
+            ->addArgument(
+                'config',
+                InputArgument::OPTIONAL,
+                'Configuration filename (i.e. anonymizer.yml)'
+            )
+            ->addArgument(
+                'dsn',
+                InputArgument::OPTIONAL,
+                'Data source name (i.e. mysql://username:password:host/dbname)'
+            )
         ;
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $pdoUrl = getenv('ANONYMIZER_PDO');
         $filename = getenv('ANONYMIZER_FILENAME');
+        $dsn = getenv('ANONYMIZER_DSN');
+
+        if ($input->getArgument('config')) {
+            $filename = $input->getArgument('config');
+        }
+        if ($input->getArgument('dsn')) {
+            $dsn = $input->getArgument('dsn');
+        }
+
+        if (!$filename) {
+            throw new RuntimeException("Config file not specified (use argument or environment variable)");
+        }
+        if (!$dsn) {
+            throw new RuntimeException("DSN not specified (use argument or environment variable)");
+        }
 
         $output->writeLn("<info>Anonymizer</info>");
-        $output->writeLn(" * DSN: " . $pdoUrl);
-        $output->writeLn(" * Config: " . $filename);
+        // $output->writeLn(" * DSN: " . $dsn);
+        // $output->writeLn(" * Config: " . $filename);
 
         $connector = new Connector();
-        $config = $connector->getConfig($pdoUrl);
+        $config = $connector->getConfig($dsn);
         if (!$connector->exists($config)) {
             throw new RuntimeException("Failed to connect to database");
         }
@@ -39,7 +63,6 @@ class RunCommand extends Command
 
         $loader = new YamlLoader();
         $anonymizer = $loader->loadFile($filename);
-        //print_r($anonymizer);
         $anonymizer->execute($pdo, $output);
         $output->writeLn("Done");
 

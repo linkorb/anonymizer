@@ -22,9 +22,12 @@ $loader = require $filename;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Dotenv\Dotenv;
 
+$filename = __DIR__.'/../.env';
 
-$dotenv = new Dotenv();
-$dotenv->load(__DIR__.'/../.env');
+if (file_exists($filename)) {
+    $dotenv = new Dotenv();
+    $dotenv->load($filename);
+}
 
 $application = new Application('Anonymizer', '0.0.1');
 $application->setCatchExceptions(true);
