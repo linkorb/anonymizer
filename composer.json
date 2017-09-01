@@ -1,0 +1,31 @@
+{
+    "name": "linkorb/anonymizer",
+    "description": "Data anonymizers",
+    "homepage": "https://github.com/linkorb/anonymizer",
+    "keywords": ["anonymizer", "data", "linkorb"],
+    "type": "application",
+    "authors": [
+        {
+            "name": "LinkORB",
+            "email": "engineering@linkorb.com",
+            "role": "Development"
+        }
+    ],
+    "require": {
+        "symfony/yaml": "~3.0|~2.7",
+	"fzaninotto/faker": "~1.0",
+        "linkorb/boost": "~1.0",
+        "linkorb/connector": "~1.0",
+        "linkorb/collection": "~1.0"
+    },
+    "require-dev": {
+        "symfony/dotenv": "~3.0",
+        "symfony/console": "~2.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Anonymizer\\": "src/"
+        }
+    },
+    "license": "MIT"
+}
