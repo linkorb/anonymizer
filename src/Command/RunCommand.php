@@ -51,8 +51,8 @@ class RunCommand extends Command
         }
 
         $output->writeLn("<info>Anonymizer</info>");
-        // $output->writeLn(" * DSN: " . $dsn);
-        // $output->writeLn(" * Config: " . $filename);
+        $output->writeLn(" * DSN: " . $dsn);
+        $output->writeLn(" * Config: " . $filename);
 
         $connector = new Connector();
         $config = $connector->getConfig($dsn);
