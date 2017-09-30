@@ -57,7 +57,7 @@ If you have any columns in other tables that reference this column, you can list
 
 ## Configuration
 
-You can use the environment (or a .env file) to pass ANONYMIZER_PDO and ANONYMIZER_FILENAME values to the `anonymizer run` command. These values will be used to connect to the database, and read the specified configuration yaml file.
+You can use the environment (or a .env file) to pass ANONYMIZER_DSN and ANONYMIZER_FILENAME values to the `anonymizer run` command. These values will be used to connect to the database, and read the specified configuration yaml file.
 
 ## About the "randomly" generated data
 
