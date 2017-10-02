@@ -49,11 +49,17 @@ truncate:
 drop:
   - user.ip
   - request.agent
+  - tmp*
+  - *.password
 ```
 
 All columns are listed in `tableName.columnName` format. For each column a `method` is defined, with some optional `arguments`. Most common is the `faker` method, that takes a `formatter` as an argument (i.e. email, userName, city, ipv4, etc - see the faker docs for more)
 
 If you have any columns in other tables that reference this column, you can list them in the `cascades` key (optional). This will ensure that the external columns are updated with the same new value so their references still work.
+
+## Wildcards
+
+You can use wildcards (*, ?) in tablenames of the `drop` list.
 
 ## Configuration
 
@@ -64,6 +70,11 @@ You can use the environment (or a .env file) to pass ANONYMIZER_DSN and ANONYMIZ
 * The faker is initialized with the same seed every run (0). This ensures that multiple runs of anonymizer on the same source data result in the same anonymized data.
 * The faker method ensures all generated values are unique within a single table. This prevents problems with references etc
 * If you list cascades that contain values that are not defined in the source table, they will be updated to NULL. This prevents sensitive data lingering around in cascades accidentally. In a properly integrity-checked database this scenario would not happen.
+
+## Verbosity / schema
+
+anonymizer analyzes the schema (tablenames + columnnames) before running. This information is used by the wildcard functionality.
+You can run anonymizer with `-v` to increase the verbosity to view this data. This can help you to verify if you're not seeing any tables or columns that should be dropped.
 
 ## License
 
