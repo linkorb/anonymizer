@@ -48,11 +48,13 @@ class Anonymizer
             }
         }
 
-        // foreach ($this->schema as $tableName => $columns) {
-        //     foreach ($columns as $name=>$details) {
-        //         echo $tableName . '.' . $name . "\n";
-        //     }
-        // }
+        if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERBOSE) {
+          foreach ($this->schema as $tableName => $columns) {
+              foreach ($columns as $name=>$details) {
+                  $output->writeLn($tableName . '.' . $name);
+              }
+          }
+        }
         //exit();
         //print_r($this->schema); exit("DONE");
     }
