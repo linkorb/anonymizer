@@ -27,5 +27,6 @@
             "Anonymizer\\": "src/"
         }
     },
+    "bin": ["bin/anonymizer"],
     "license": "MIT"
 }
