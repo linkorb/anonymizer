@@ -17,7 +17,7 @@ Anonymizer is a toolkit to help you to automate production data anonymization fo
 2. Create a configuration file (example below) for your application that lists all the sensitive columns with a method for anonymization.
 3. Run anonymizer on your test database:
 
-    bin/anonymizer anonymizer.yml mysql://username:password@hostname/dbname
+    vendor/bin/anonymizer
 
 ## anonymizer.yml format
 
@@ -63,7 +63,7 @@ You can use wildcards (*, ?) in tablenames of the `drop` list.
 
 ## Configuration
 
-You can use the environment (or a .env file) to pass ANONYMIZER_DSN and ANONYMIZER_FILENAME values to the `anonymizer run` command. These values will be used to connect to the database, and read the specified configuration yaml file.
+You can use the environment (or a .env file) to pass ANONYMIZER_DSN (or PDO) and ANONYMIZER_FILENAME values to the `anonymizer run` command. These values will be used to connect to the database, and read the specified configuration yaml file.
 
 ## About the "randomly" generated data
 

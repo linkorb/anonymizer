@@ -21,7 +21,8 @@ class RunCommand extends Command
             ->addArgument(
                 'config',
                 InputArgument::OPTIONAL,
-                'Configuration filename (i.e. anonymizer.yml)'
+                'Configuration filename',
+                'anonymizer.yml'
             )
             ->addArgument(
                 'dsn',
@@ -35,6 +36,9 @@ class RunCommand extends Command
     {
         $filename = getenv('ANONYMIZER_FILENAME');
         $dsn = getenv('ANONYMIZER_DSN');
+        if (!$dsn) {
+            $dsn = getenv('PDO');
+        }
 
         if ($input->getArgument('config')) {
             $filename = $input->getArgument('config');
