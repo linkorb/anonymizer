@@ -70,6 +70,17 @@ class Anonymizer
         return $tableNames;
     }
 
+    public function expandColumns($tableName, $pattern)
+    {
+        $columnNames = [];
+        foreach ($this->schema[$tableName] as $columnName => $data) {
+            if (fnmatch($pattern, $columnName)) {
+                $columnNames[] = $columnName;
+            }
+        }
+        return $columnNames;
+    }
+
     public function execute(PDO $pdo, OutputInterface $output)
     {
         $this->loadSchema($pdo, $output);
@@ -195,14 +206,16 @@ class Anonymizer
                         $subStmt->execute();
                         break;
                     case 2:
-                        $columnName = (string)$part[1];
-                        if (isset($this->schema[$tableName][$columnName])) {
-                            $output->writeLn("Dropping column: <info>{$tableName}.{$columnName}</info>");
+                        $columnNames = $this->expandColumns($tableName, (string)$part[1]);
+                        foreach ($columnNames as $columnName) {
+                            if (isset($this->schema[$tableName][$columnName])) {
+                                $output->writeLn("Dropping column: <info>{$tableName}.{$columnName}</info>");
 
-                            $subStmt = $pdo->prepare(
-                                "ALTER TABLE " . $tableName . ' DROP COLUMN ' . $columnName
-                            );
-                            $subStmt->execute();
+                                $subStmt = $pdo->prepare(
+                                    "ALTER TABLE " . $tableName . ' DROP COLUMN ' . $columnName
+                                );
+                                $subStmt->execute();
+                            }
                         }
                         break;
                     default:
