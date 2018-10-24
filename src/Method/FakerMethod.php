@@ -6,6 +6,7 @@ class FakerMethod
 {
     protected $faker;
     protected $formatter = 'email';
+
     public function __construct($arguments = [])
     {
         $locale = 'en_US';
@@ -23,5 +24,10 @@ class FakerMethod
     {
         $value = $this->faker->unique()->{$this->formatter};
         return $value;
+    }
+
+    public function getScope()
+    {
+        return 'row';
     }
 }

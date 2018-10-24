@@ -88,95 +88,117 @@ class Anonymizer
 
         foreach ($this->columns as $column) {
             $output->writeLn("Anonymizing column: <info>" . $column->identifier() . "</info> ({$column->displayMethod()})");
-            $method = new \Anonymizer\Method\FakerMethod($column->getArguments());
-
-            $stmt = $pdo->prepare("SELECT " . $column->getName() . ' FROM ' . $column->getTableName());
-            $stmt->execute();
-            $map = [];
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $oldValue = $row[$column->getName()];
-                $newValue = $method->apply($oldValue, $row);
-                $map[$oldValue] = $newValue;
-            }
-            $max = count($map) * (1+count($column->getCascades()));
-            //print_r($map);
-
-            $progress = new ProgressBar($output, $max);
-            $progress->setRedrawFrequency(1000);
-            $progress->start();
-            $missing = [];
-
-            // Sanity check
-            foreach ($column->getCascades() as $cascade) {
-                $missing[$cascade] = [];
-                $part = explode('.', $cascade);
-                if (count($part)!=2) {
-                    throw new RuntimeException("Expected cascade with 2 parts: " . $cascade);
-                }
-                $cascadeTable = $part[0];
-                $cascadeColumn = $part[1];
-                $stmt = $pdo->prepare("SELECT " . $cascadeColumn . ' FROM ' . $cascadeTable);
-                $stmt->execute();
-                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                foreach ($rows as $row) {
-                    $value = $row[$cascadeColumn];
-                    if ($value && !isset($map[$value])) {
-                        $missing[$cascade][] = $value;
-                    }
-                }
+            switch ($column->getMethod()) {
+                case 'faker':
+                    $method = new \Anonymizer\Method\FakerMethod($column->getArguments());
+                    break;
+                case 'fixed':
+                    $method = new \Anonymizer\Method\FixedMethod($column->getArguments());
+                    break;
+                default:
+                    throw new RuntimeException("Unsupported method: " . $column->getMethod());
             }
 
-            // Fix main table
-            foreach ($map as $oldValue => $newValue) {
-                //echo $oldValue . ' => ' . $newValue . "\n";
+            if ($method->getScope()=='table') {
                 $stmt = $pdo->prepare(
-                    "UPDATE " . $column->getTableName() . ' SET ' . $column->getName() . '=:newValue WHERE ' . $column->getName() . '=:oldValue'
+                    "UPDATE " . $column->getTableName() . ' SET ' . $column->getName() . '=:newValue'
                 );
                 $stmt->execute(
                     [
-                        'oldValue' => $oldValue,
-                        'newValue' => $newValue
+                        'newValue' => $method->apply(null, null)
                     ]
                 );
-                $progress->advance();
-
             }
 
-            // fix cascades
-            foreach ($column->getCascades() as $cascade) {
-                $part = explode('.', $cascade);
-                if (count($part)!=2) {
-                    throw new RuntimeException("Expected cascade with 2 parts: " . $cascade);
+            if ($method->getScope()=='row') {
+                $stmt = $pdo->prepare("SELECT " . $column->getName() . ' FROM ' . $column->getTableName());
+                $stmt->execute();
+                $map = [];
+                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                    $oldValue = $row[$column->getName()];
+                    $newValue = $method->apply($oldValue, $row);
+                    $map[$oldValue] = $newValue;
                 }
-                $cascadeTable = $part[0];
-                $cascadeColumn = $part[1];
+                $max = count($map) * (1+count($column->getCascades()));
+                //print_r($map);
 
-                // Fix referencing values
-                foreach ($map as $oldValue=>$newValue) {
-                    $sql = "UPDATE " . $cascadeTable . ' SET ' . $cascadeColumn . '=:newValue WHERE ' . $cascadeColumn . '=:oldValue';
-                    $subStmt = $pdo->prepare(
-                        $sql
+                $progress = new ProgressBar($output, $max);
+                $progress->setRedrawFrequency(1000);
+                $progress->start();
+                $missing = [];
+
+                // Sanity check
+                foreach ($column->getCascades() as $cascade) {
+                    $missing[$cascade] = [];
+                    $part = explode('.', $cascade);
+                    if (count($part)!=2) {
+                        throw new RuntimeException("Expected cascade with 2 parts: " . $cascade);
+                    }
+                    $cascadeTable = $part[0];
+                    $cascadeColumn = $part[1];
+                    $stmt = $pdo->prepare("SELECT " . $cascadeColumn . ' FROM ' . $cascadeTable);
+                    $stmt->execute();
+                    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    foreach ($rows as $row) {
+                        $value = $row[$cascadeColumn];
+                        if ($value && !isset($map[$value])) {
+                            $missing[$cascade][] = $value;
+                        }
+                    }
+                }
+
+                // Fix main table
+                foreach ($map as $oldValue => $newValue) {
+                    //echo $oldValue . ' => ' . $newValue . "\n";
+                    $stmt = $pdo->prepare(
+                        "UPDATE " . $column->getTableName() . ' SET ' . $column->getName() . '=:newValue WHERE ' . $column->getName() . '=:oldValue'
                     );
-                    $subStmt->execute(
+                    $stmt->execute(
                         [
                             'oldValue' => $oldValue,
                             'newValue' => $newValue
                         ]
                     );
                     $progress->advance();
+
                 }
-                // Fix missing values
-                foreach ($missing[$cascade] as $k => $missingValue) {
-                    $sql = "UPDATE " . $cascadeTable . ' SET ' . $cascadeColumn . '=null WHERE ' . $cascadeColumn . '=:missingValue';
-                    $subStmt = $pdo->prepare(
-                        $sql
-                    );
-                    $subStmt->execute(
-                        [
-                            'missingValue' => $missingValue
-                        ]
-                    );
+
+                // fix cascades
+                foreach ($column->getCascades() as $cascade) {
+                    $part = explode('.', $cascade);
+                    if (count($part)!=2) {
+                        throw new RuntimeException("Expected cascade with 2 parts: " . $cascade);
+                    }
+                    $cascadeTable = $part[0];
+                    $cascadeColumn = $part[1];
+
+                    // Fix referencing values
+                    foreach ($map as $oldValue=>$newValue) {
+                        $sql = "UPDATE " . $cascadeTable . ' SET ' . $cascadeColumn . '=:newValue WHERE ' . $cascadeColumn . '=:oldValue';
+                        $subStmt = $pdo->prepare(
+                            $sql
+                        );
+                        $subStmt->execute(
+                            [
+                                'oldValue' => $oldValue,
+                                'newValue' => $newValue
+                            ]
+                        );
+                        $progress->advance();
+                    }
+                    // Fix missing values
+                    foreach ($missing[$cascade] as $k => $missingValue) {
+                        $sql = "UPDATE " . $cascadeTable . ' SET ' . $cascadeColumn . '=null WHERE ' . $cascadeColumn . '=:missingValue';
+                        $subStmt = $pdo->prepare(
+                            $sql
+                        );
+                        $subStmt->execute(
+                            [
+                                'missingValue' => $missingValue
+                            ]
+                        );
+                    }
                 }
             }
         }
