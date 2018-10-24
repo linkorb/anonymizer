@@ -17,6 +17,7 @@ class Anonymizer
     protected $columns = [];
     protected $truncate = [];
     protected $drop = [];
+    protected $flags = [];
 
     use BoostTrait;
     use ProtectedAccessorsTrait;
@@ -224,6 +225,15 @@ class Anonymizer
             }
         }
 
+
+    public function setFlag($key, $value)
+    {
+        $this->flags[$key] = $value;
+    }
+
+    public function getFlag($key)
+    {
+        return $this->flags[$key] ?? null;
     }
 
 

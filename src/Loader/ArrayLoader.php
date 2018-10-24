@@ -12,6 +12,9 @@ class ArrayLoader
     {
         $anonymizer = new Anonymizer();
 
+        if (isset($data['config'])) {
+            $anonymizer->setConfig($data['config']);
+        }
         if (isset($data['columns'])) {
             foreach ($data['columns'] as $columnName => $columnData) {
                 $part = explode('.', $columnName);
@@ -36,6 +39,11 @@ class ArrayLoader
         }
         if (isset($data['drop'])) {
             $anonymizer->setDrop($data['drop']);
+        }
+        if (isset($data['flags'])) {
+            foreach ($data['flags'] as $key=>$value) {
+                $anonymizer->setFlag($key, $value);
+            }
         }
         return $anonymizer;
     }
