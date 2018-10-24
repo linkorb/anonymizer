@@ -225,6 +225,57 @@ class Anonymizer
             }
         }
 
+        if ($this->getFlag('drop-empty-tables')) {
+            $dbName = $pdo->query('select database()')->fetchColumn();
+
+            $stmt = $pdo->prepare(
+                "SELECT table_name, SUM(TABLE_ROWS) as c FROM INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_SCHEMA = :dbName group by table_name having c=0;"
+            );
+            $stmt->execute(
+                [
+                    'dbName' => $dbName
+                ]
+            );
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($rows as $row) {
+                $tableName = $row['table_name'];
+                $output->writeLn("Dropping empty table: <info>{$tableName}</info>");
+
+                $subStmt = $pdo->prepare(
+                    "DROP TABLE " . $tableName . ';'
+                );
+                $subStmt->execute();
+            }
+
+        }
+
+        if ($this->getFlag('drop-null-columns')) {
+            foreach ($this->schema as $tableName => $columns) {
+                foreach ($columns as $columnName => $columns) {
+                    // echo " ? " . $tableName . '.' . $columnName . PHP_EOL;
+
+                    $stmt = $pdo->prepare(
+                        "SELECT count(*) as c FROM " . $tableName . "
+                        WHERE " . $columnName . " is not null"
+                    );
+                    $stmt->execute(
+                        []
+                    );
+                    $c = $stmt->fetch(PDO::FETCH_ASSOC)['c'];
+                    if ($c==0) {
+                        $output->writeLn("Dropping null column <info>$tableName.$columnName</info>");
+                        $subStmt = $pdo->prepare(
+                            "ALTER TABLE " . $tableName . ' DROP COLUMN ' . $columnName
+                        );
+                        $subStmt->execute();
+                    }
+                }
+            }
+        }
+
+
+    }
 
     public function setFlag($key, $value)
     {
