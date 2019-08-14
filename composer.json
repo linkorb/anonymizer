@@ -12,8 +12,9 @@
         }
     ],
     "require": {
-        "symfony/yaml": "~3.0|~2.7",
-	    "fzaninotto/faker": "~1.0",
+
+        "symfony/yaml": "^4.0|^3.0|^2.7",
+	      "fzaninotto/faker": "~1.0",
         "linkorb/boost": "~1.0",
         "linkorb/connector": "~1.0",
         "linkorb/collection": "~1.0"
