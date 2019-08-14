@@ -22,7 +22,7 @@ $loader = require $filename;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Dotenv\Dotenv;
 
-$filename = __DIR__.'/../.env';
+$filename = getcwd() . '/.env';
 
 if (file_exists($filename)) {
     $dotenv = new Dotenv();
