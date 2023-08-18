@@ -65,6 +65,8 @@ You can use wildcards (*, ?) in tablenames of the `drop` list.
 
 You can use the environment (or a .env file) to pass ANONYMIZER_DSN (or PDO) and ANONYMIZER_FILENAME values to the `anonymizer run` command. These values will be used to connect to the database, and read the specified configuration yaml file.
 
+Optionally: configure `ANONYMIZER_CONFIG_PATH` to point to a directory of `.conf` files containing database connection details. This will be registered as an INI Backend to the Connector service to resolve db connections from config files.
+
 ## About the "randomly" generated data
 
 * The faker is initialized with the same seed every run (0). This ensures that multiple runs of anonymizer on the same source data result in the same anonymized data.

@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Anonymizer\Loader\YamlLoader;
 use RuntimeException;
 use Connector\Connector;
+use Connector\Backend\IniBackend;
 
 class RunCommand extends Command
 {
@@ -36,6 +37,8 @@ class RunCommand extends Command
     {
         $filename = getenv('ANONYMIZER_FILENAME');
         $dsn = getenv('ANONYMIZER_DSN');
+        $configPath = getenv('ANONYMIZER_CONFIG_PATH');
+
         if (!$dsn) {
             $dsn = getenv('PDO');
         }
@@ -59,6 +62,11 @@ class RunCommand extends Command
         $output->writeLn(" * Config: " . $filename);
 
         $connector = new Connector();
+        if ($configPath) {
+            $backend = new IniBackend($configPath, '.conf');
+            $connector->registerBackend($backend);
+        }
+
         $config = $connector->getConfig($dsn);
         if (!$connector->exists($config)) {
             throw new RuntimeException("Failed to connect to database");
