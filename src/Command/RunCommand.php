@@ -34,11 +34,11 @@ class RunCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $filename = $_ENV['ANONYMIZER_FILENAME'];
-        $dsn = $_ENV['ANONYMIZER_DSN'];
-        $configPath = $_ENV['ANONYMIZER_CONFIG_PATH'];
+        $filename = $_ENV['ANONYMIZER_FILENAME'] ?? "";
+        $dsn = $_ENV['ANONYMIZER_DSN'] ?? "";
+        $configPath = $_ENV['ANONYMIZER_CONFIG_PATH'] ?? "";
 
-        if (!$dsn) {
+        if (empty($dsn)) {
             $dsn = $_ENV['PDO'];
         }
 
@@ -49,10 +49,10 @@ class RunCommand extends Command
             $dsn = $input->getArgument('dsn');
         }
 
-        if (!$filename) {
+        if (empty($filename)) {
             throw new RuntimeException("Config file not specified (use argument or environment variable)");
         }
-        if (!$dsn) {
+        if (empty($dsn)) {
             throw new RuntimeException("DSN not specified (use argument or environment variable)");
         }
 
@@ -61,7 +61,7 @@ class RunCommand extends Command
         $output->writeLn(" * Config: " . $filename);
 
         $connector = new Connector();
-        if ($configPath) {
+        if (false === empty($configPath)) {
             $backend = new IniBackend($configPath, '.conf');
             $connector->registerBackend($backend);
         }
