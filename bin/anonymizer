@@ -26,7 +26,7 @@ $filename = getcwd() . '/.env';
 
 if (file_exists($filename)) {
     $dotenv = new Dotenv();
-    $dotenv->load($filename);
+    $dotenv->loadEnv($filename);
 }
 
 $application = new Application('Anonymizer', '0.0.1');

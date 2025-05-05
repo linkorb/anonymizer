@@ -6,7 +6,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Anonymizer\Loader\YamlLoader;
 use RuntimeException;
 use Connector\Connector;
@@ -14,7 +13,7 @@ use Connector\Backend\IniBackend;
 
 class RunCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('run')
@@ -33,7 +32,7 @@ class RunCommand extends Command
         ;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $filename = getenv('ANONYMIZER_FILENAME');
         $dsn = getenv('ANONYMIZER_DSN');
@@ -77,6 +76,6 @@ class RunCommand extends Command
         $anonymizer = $loader->loadFile($filename);
         $anonymizer->execute($pdo, $output);
         $output->writeLn("Done");
-
+        return Command::SUCCESS;
     }
 }
