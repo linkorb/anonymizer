@@ -8,14 +8,12 @@ use Boost\BoostTrait;
 use Boost\Accessors\ProtectedAccessorsTrait;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Collection\TypedArray;
-use Anonymizer\Model\Column;
 use PDO;
 use RuntimeException;
 
 class Anonymizer
 {
-    protected TypedArray $columns;
+    protected array $columns = [];
     protected array $truncate = [];
     protected array $drop = [];
     protected array $flags = [];
@@ -23,11 +21,6 @@ class Anonymizer
 
     use BoostTrait;
     use ProtectedAccessorsTrait;
-
-    public function __construct()
-    {
-        $this->columns = new TypedArray(Column::class);
-    }
 
     private function loadSchema(PDO $pdo, OutputInterface $output): void
     {

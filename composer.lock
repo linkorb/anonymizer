@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7adc340cae8d3d9a7b01c17d31766789",
+    "content-hash": "1978bd319da46884b1b43bd72c3a4fc3",
     "packages": [
         {
             "name": "fakerphp/faker",
@@ -117,52 +117,6 @@
                 "source": "https://github.com/linkorb/boost/tree/master"
             },
             "time": "2018-02-23T09:33:35+00:00"
-        },
-        {
-            "name": "linkorb/collection",
-            "version": "v1.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/linkorb/collection.git",
-                "reference": "ff2038ebd17ecb8bfd1becd7bc649f668d847b40"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/linkorb/collection/zipball/ff2038ebd17ecb8bfd1becd7bc649f668d847b40",
-                "reference": "ff2038ebd17ecb8bfd1becd7bc649f668d847b40",
-                "shasum": ""
-            },
-            "type": "application",
-            "autoload": {
-                "psr-4": {
-                    "Collection\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "LinkORB",
-                    "email": "engineering@linkorb.com",
-                    "role": "Development"
-                }
-            ],
-            "description": "Super powered collections",
-            "homepage": "https://github.com/linkorb/collection",
-            "keywords": [
-                "array",
-                "collection",
-                "data structure",
-                "linkorb",
-                "php-ds"
-            ],
-            "support": {
-                "issues": "https://github.com/linkorb/collection/issues",
-                "source": "https://github.com/linkorb/collection/tree/v1.0.0"
-            },
-            "time": "2017-08-05T08:56:43+00:00"
         },
         {
             "name": "linkorb/connector",

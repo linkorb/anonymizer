@@ -4,9 +4,8 @@ namespace Anonymizer\Model;
 
 use Boost\BoostTrait;
 use Boost\Accessors\ProtectedAccessorsTrait;
-use Collection\Identifiable;
 
-class Column implements Identifiable
+class Column
 {
     protected $name;
     protected $tableName;
