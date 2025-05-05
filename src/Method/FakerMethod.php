@@ -26,7 +26,7 @@ class FakerMethod
         return $value;
     }
 
-    public function getScope()
+    public function getScope(): string
     {
         return 'row';
     }

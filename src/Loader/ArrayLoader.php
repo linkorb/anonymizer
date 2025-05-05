@@ -8,7 +8,7 @@ use RuntimeException;
 
 class ArrayLoader
 {
-    public function loadData($data)
+    public function loadData($data): Anonymizer
     {
         $anonymizer = new Anonymizer();
 
@@ -31,7 +31,7 @@ class ArrayLoader
                 if (isset($columnData['cascades'])) {
                     $column->setCascades($columnData['cascades']);
                 }
-                $anonymizer->getColumns()->add($column);
+                $anonymizer->getColumns()->append($column);
             }
         }
         if (isset($data['truncate'])) {

@@ -5,6 +5,11 @@ namespace Anonymizer\Method;
 class FixedMethod
 {
     protected $faker;
+    /**
+     * @var mixed
+     */
+    private $value;
+
     public function __construct($arguments = [])
     {
         $this->value = $arguments['value'];
@@ -15,7 +20,7 @@ class FixedMethod
         return $this->value;
     }
 
-    public function getScope()
+    public function getScope(): string
     {
         return 'table';
     }

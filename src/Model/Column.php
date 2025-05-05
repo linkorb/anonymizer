@@ -4,9 +4,8 @@ namespace Anonymizer\Model;
 
 use Boost\BoostTrait;
 use Boost\Accessors\ProtectedAccessorsTrait;
-use Collection\Identifiable;
 
-class Column implements Identifiable
+class Column
 {
     protected $name;
     protected $tableName;
@@ -28,7 +27,7 @@ class Column implements Identifiable
         return $this->method;
     }
 
-    public function identifier()
+    public function identifier(): string
     {
        return $this->tableName . '.' . $this->name;
     }

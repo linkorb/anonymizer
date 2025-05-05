@@ -2,32 +2,31 @@
 
 namespace Anonymizer;
 
+use Anonymizer\Method\FakerMethod;
+use Anonymizer\Method\FixedMethod;
 use Boost\BoostTrait;
 use Boost\Accessors\ProtectedAccessorsTrait;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Collection\TypedArray;
-use Anonymizer\Model\Column;
 use PDO;
 use RuntimeException;
 
 class Anonymizer
 {
-    protected $name;
-    protected $columns = [];
-    protected $truncate = [];
-    protected $drop = [];
-    protected $flags = [];
+    protected \ArrayObject $columns;
+    protected array $truncate = [];
+    protected array $drop = [];
+    protected array $flags = [];
+    protected array $schema = [];
 
     use BoostTrait;
     use ProtectedAccessorsTrait;
 
-    public function __construct()
-    {
-        $this->columns = new TypedArray(Column::class);
+    public function __construct() {
+        $this->columns = new \ArrayObject();
     }
 
-    private function loadSchema(PDO $pdo, OutputInterface $output)
+    private function loadSchema(PDO $pdo, OutputInterface $output): void
     {
         $stmt = $pdo->prepare("SHOW tables;");
         $stmt->execute();
@@ -60,7 +59,7 @@ class Anonymizer
         //print_r($this->schema); exit("DONE");
     }
 
-    public function expandTables($pattern)
+    public function expandTables($pattern): array
     {
         $tableNames = [];
         foreach ($this->schema as $tableName => $columns) {
@@ -71,7 +70,7 @@ class Anonymizer
         return $tableNames;
     }
 
-    public function expandColumns($tableName, $pattern)
+    public function expandColumns($tableName, $pattern): array
     {
         $columnNames = [];
         foreach ($this->schema[$tableName] as $columnName => $data) {
@@ -82,7 +81,7 @@ class Anonymizer
         return $columnNames;
     }
 
-    public function execute(PDO $pdo, OutputInterface $output)
+    public function execute(PDO $pdo, OutputInterface $output): void
     {
         $this->loadSchema($pdo, $output);
 
@@ -90,10 +89,10 @@ class Anonymizer
             $output->writeLn("Anonymizing column: <info>" . $column->identifier() . "</info> ({$column->displayMethod()})");
             switch ($column->getMethod()) {
                 case 'faker':
-                    $method = new \Anonymizer\Method\FakerMethod($column->getArguments());
+                    $method = new FakerMethod($column->getArguments());
                     break;
                 case 'fixed':
-                    $method = new \Anonymizer\Method\FixedMethod($column->getArguments());
+                    $method = new FixedMethod($column->getArguments());
                     break;
                 default:
                     throw new RuntimeException("Unsupported method: " . $column->getMethod());
@@ -188,7 +187,7 @@ class Anonymizer
                         $progress->advance();
                     }
                     // Fix missing values
-                    foreach ($missing[$cascade] as $k => $missingValue) {
+                    foreach ($missing[$cascade] as $missingValue) {
                         $sql = "UPDATE " . $cascadeTable . ' SET ' . $cascadeColumn . '=null WHERE ' . $cascadeColumn . '=:missingValue';
                         $subStmt = $pdo->prepare(
                             $sql
@@ -299,7 +298,7 @@ class Anonymizer
 
     }
 
-    public function setFlag($key, $value)
+    public function setFlag($key, $value): void
     {
         $this->flags[$key] = $value;
     }
