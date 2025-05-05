@@ -31,7 +31,7 @@ class ArrayLoader
                 if (isset($columnData['cascades'])) {
                     $column->setCascades($columnData['cascades']);
                 }
-                $anonymizer->getColumns()[] = $column;
+                $anonymizer->getColumns()->append($column);
             }
         }
         if (isset($data['truncate'])) {

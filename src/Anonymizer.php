@@ -13,7 +13,7 @@ use RuntimeException;
 
 class Anonymizer
 {
-    protected array $columns = [];
+    protected \ArrayObject $columns;
     protected array $truncate = [];
     protected array $drop = [];
     protected array $flags = [];
@@ -21,6 +21,10 @@ class Anonymizer
 
     use BoostTrait;
     use ProtectedAccessorsTrait;
+
+    public function __construct() {
+        $this->columns = new \ArrayObject();
+    }
 
     private function loadSchema(PDO $pdo, OutputInterface $output): void
     {
