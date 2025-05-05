@@ -34,12 +34,12 @@ class RunCommand extends Command
 
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $filename = getenv('ANONYMIZER_FILENAME');
-        $dsn = getenv('ANONYMIZER_DSN');
-        $configPath = getenv('ANONYMIZER_CONFIG_PATH');
+        $filename = $_ENV['ANONYMIZER_FILENAME'];
+        $dsn = $_ENV['ANONYMIZER_DSN'];
+        $configPath = $_ENV['ANONYMIZER_CONFIG_PATH'];
 
         if (!$dsn) {
-            $dsn = getenv('PDO');
+            $dsn = $_ENV['PDO'];
         }
 
         if ($input->getArgument('config')) {
