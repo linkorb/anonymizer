@@ -21,8 +21,7 @@ class RunCommand extends Command
             ->addArgument(
                 'config',
                 InputArgument::OPTIONAL,
-                'Configuration filename',
-                'anonymizer.yml'
+                'Configuration filename'
             )
             ->addArgument(
                 'dsn',
@@ -43,8 +42,17 @@ class RunCommand extends Command
         }
 
         if ($input->getArgument('config')) {
+            if (!empty($filename)) {
+                $output->writeln("<warning>Both ANONYMIZER_FILENAME env, and config argument are present. Config argument takes precedence.</warning>");
+            }
             $filename = $input->getArgument('config');
+        } else {
+            if (empty($filename)) {
+                $filename = 'anonymizer.yml';
+                $output->writeln("<warning>No configuration specified, assuming default configuration file</warning>");
+            }
         }
+
         if ($input->getArgument('dsn')) {
             $dsn = $input->getArgument('dsn');
         }
