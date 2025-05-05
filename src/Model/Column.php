@@ -28,7 +28,7 @@ class Column implements Identifiable
         return $this->method;
     }
 
-    public function identifier()
+    public function identifier(): string
     {
        return $this->tableName . '.' . $this->name;
     }

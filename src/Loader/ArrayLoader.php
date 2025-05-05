@@ -8,7 +8,7 @@ use RuntimeException;
 
 class ArrayLoader
 {
-    public function loadData($data)
+    public function loadData($data): Anonymizer
     {
         $anonymizer = new Anonymizer();
 
